@@ -1,0 +1,168 @@
+---
+- hosts: docker
+  tasks:
+    - name: Create main dir
+      file:
+        path: /home/daou_docker/exporters
+        state: directory
+
+
+    - name: Install packages
+      yum:
+        name:
+          - wget
+        state: latest
+
+
+    - name: Install docker
+      yum:
+        name: docker
+        state: latest
+
+    - name: Install docker-compose
+      shell:
+        cmd: curl -L "https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+    - name: Chmod docker-compose
+      shell:
+        cmd: chmod +x /usr/local/bin/docker-compose
+
+    # - name: Make link docker-compose
+    #   shell:
+    #     cmd: ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+    - name: Make link docker-compose
+      file:
+        src: /usr/local/bin/docker-compose
+        dest: /usr/bin/docker-compose
+        state: link
+
+    - name: Start docker
+      service:
+        name: docker
+        state: started
+
+
+
+    - name: Create tomcat dir
+      file:
+        path: /home/daou_docker/exporters/tomcat
+        state: directory
+  
+    - name: Install tomcat
+      template:
+        src: "/home/daou_docker/jmx-exporter/docker-compose.yml"
+        dest: "/home/daou_docker/exporters/tomcat"
+
+    - name: Run Tomcat
+      become: true
+      shell:
+        chdir: "/home/daou_docker/exporters/tomcat"
+        cmd: docker-compose up -d tomcat
+
+
+
+    - name: Create jmx-exproter dir
+      file: 
+        path: /home/daou_docker/exporters/jmx-exporter
+        state: directory
+
+          #- name: Install & Run jmx-exporter
+          #shell:
+          #chdir: "/home/daou_docker/exporters/jmx-exporter"
+          #cmd: wget https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.16.1/jmx_prometheus_javaagent-0.16.1.jar
+          
+
+    - name: Install & Run jmx-exporter
+      get_url:
+        url: https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.16.1/jmx_prometheus_javaagent-0.16.1.jar
+        dest: /home/daou_docker/exporters/jmx-exporter
+
+
+    - name: Create node-exproter dir
+      file: 
+        path: /home/daou_docker/exporters/node-exporter
+        state: directory
+
+    - name: Install node-exporter
+      template:
+        src: "/home/daou_docker/node-exporter/docker-compose.yml"
+        dest: "/home/daou_docker/exporters/node-exporter"
+
+    - name: Run node-exporter
+      become: true
+      shell:
+        chdir: "/home/daou_docker/exporters/node-exporter"
+        cmd: docker-compose up -d node-exporter
+
+    
+    - name: Create mysqld dir
+      file:
+        path: /home/daou_docker/exporters/mysqld
+        state: directory
+
+    - name: Install mysqld
+      template:
+        src: "/home/daou_docker/mysqld/docker-compose.yml"
+        dest: "/home/daou_docker/exporters/mysqld"
+
+    - name: Run mysqld
+      shell:
+        chdir: "/home/daou_docker/exporters/mysqld" 
+        cmd: docker-compose up -d mysqld
+
+
+
+    - name: Create mysqld-exporter dir
+      file:
+        path: /home/daou_docker/exporters/mysqld-exporter
+        state: directory
+
+    - name: Install mysqld-exporter
+      template:
+        src: "/home/daou_docker/mysqld-exporter/docker-compose.yml"
+        dest: "/home/daou_docker/exporters/mysqld-exporter"
+
+    - name: Run mysqld-exporter
+      become: true
+      shell:
+        chdir: "/home/daou_docker/exporters/mysqld-exporter"
+        cmd: docker-compose up -d mysqld-exporter
+
+
+
+    - name: Create apache dir
+      file: 
+        path: /home/daou_docker/exporters/apache
+        state: directory
+
+    - name: Install apache
+      template:
+        src: "/home/daou_docker/apache-exporter/docker-compose.yml"
+        dest: "/home/daou_docker/exporters/apache"
+
+    - name: Run apache
+      become: true
+      shell:
+        chdir: "/home/daou_docker/exporters/apache"
+        cmd: docker-compose up -d httpd
+
+
+
+    - name: Create apache-exporter dir
+      file: 
+        path: /home/daou_docker/exporters/apache-exporter
+        state: directory
+
+    - name: Install apache-exporter
+      template:
+        src: "/home/daou_docker/apache-exporter/docker-compose.yml"
+        dest: "/home/daou_docker/exporters/apache-exporter"
+
+    - name: Run apache-exporter
+      becone: true
+      shell:
+        chdir: "/home/daou_docker/exporters/apache-exporter"
+        cmd: docker-compose up -d apache-exporter
+
+
