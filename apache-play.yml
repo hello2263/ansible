@@ -1,0 +1,35 @@
+---
+- hosts: exporter
+  gather_facts: no
+  tasks:
+    - name: Create apache dir
+      file:
+        path: /home/daou_docker/exporters/apache
+        state: directory
+
+    - name: Install apache
+      template:
+        src: "/home/daou_docker/apache-exporter/docker-compose.yml"
+        dest: "/home/daou_docker/exporters/apache"
+
+    - name: Run apache
+      become: true
+      shell:
+        chdir: "/home/daou_docker/exporters/apache"
+        cmd: docker-compose up -d httpd
+
+    - name: Create apache-exporter dir
+      file:
+        path: /home/daou_docker/exporters/apache-exporter
+        state: directory
+
+    - name: Install apache-exporter
+      template:
+        src: "/home/daou_docker/apache-exporter/docker-compose.yml"
+        dest: "/home/daou_docker/exporters/apache-exporter"
+    
+    - name: Run apache-exporter
+      become: true
+      shell:
+        chdir: "/home/daou_docker/exporters/apache-exporter"
+        cmd: docker-compose up -d apache-exporter

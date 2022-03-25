@@ -1,0 +1,31 @@
+---
+- hosts: exporter
+  gather_facts: no
+  tasks:
+
+    - name: Create tomcat dir
+      file:
+        path: /home/daou_docker/exporters/tomcat
+        state: directory
+
+    - name: Install tomcat
+      template:
+        src: "/home/daou_docker/jmx-exporter/docker-compose.yml"
+        dest: "/home/daou_docker/exporters/tomcat"
+
+    - name: Run Tomcat
+      become: true
+      shell:
+        chdir: "/home/daou_docker/exporters/tomcat"
+        cmd: docker-compose up -d tomcat
+
+    - name: Create jmx-exproter dir
+      file:
+        path: /home/daou_docker/exporters/jmx-exporter
+        state: directory
+
+    - name: Install & Run jmx-exporter
+      get_url:
+        url: https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.16.1/jmx_prometheus_javaagent-0.16.1.jar
+        dest: /home/daou_docker/exporters/jmx-exporter
+

@@ -1,0 +1,35 @@
+---
+- hosts: exporter
+  gather_facts: no
+  tasks:
+    - name: Create mysqld dir
+      file:
+        path: /home/daou_docker/exporters/mysqld
+        state: directory
+
+    - name: Install mysqld
+      template:
+        src: "/home/daou_docker/mysqld/docker-compose.yml"
+        dest: "/home/daou_docker/exporters/mysqld"
+
+    - name: Run mysqld
+      shell:
+        chdir: "/home/daou_docker/exporters/mysqld" 
+        cmd: docker-compose up -d mysqld
+
+    - name: Create mysqld-exporter dir
+      file:
+        path: /home/daou_docker/exporters/mysqld-exporter
+        state: directory
+
+    - name: Install mysqld-exporter
+      template:
+        src: "/home/daou_docker/mysqld-exporter/docker-compose.yml"
+        dest: "/home/daou_docker/exporters/mysqld-exporter"
+
+    - name: Run mysqld-exporter
+      become: true
+      shell:
+        chdir: "/home/daou_docker/exporters/mysqld-exporter"
+        cmd: docker-compose up -d mysqld-exporter
+
