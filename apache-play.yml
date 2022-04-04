@@ -4,30 +4,46 @@
   tasks:
     - name: Create apache dir
       file:
-        path: /home/daou_docker/exporters/apache
-        state: directory
-
-    - name: Install apache
-      template:
-        src: "/home/daou_docker/apache-exporter/docker-compose.yml"
-        dest: "/home/daou_docker/exporters/apache"
-
-    - name: Run apache
-      become: true
-      shell:
-        chdir: "/home/daou_docker/exporters/apache"
-        cmd: docker-compose up -d httpd
-
-    - name: Create apache-exporter dir
-      file:
         path: /home/daou_docker/exporters/apache-exporter
         state: directory
 
-    - name: Install apache-exporter
+    - name: Create httpd dir
+      file:
+        path: /home/daou_docker/exporters/apache-exporter/httpd
+        state: directory
+
+    - name: Create httpd.conf dir
+      file:
+        path: /home/daou_docker/exporters/apache-exporter/httpd/conf
+        state: directory
+
+    - name: Create httpd.confd dir
+      file:
+        path: /home/daou_docker/exporters/apache-exporter/httpd/conf.d
+        state: directory
+
+
+    - name: Install httpd
       template:
         src: "/home/daou_docker/apache-exporter/docker-compose.yml"
         dest: "/home/daou_docker/exporters/apache-exporter"
-    
+
+    - name: Move httpd file1
+      template:
+        src: "/home/daou_docker/apache-exporter/httpd/conf/httpd.conf"
+        dest: "/home/daou_docker/exporters/apache-exporter/httpd/conf"
+
+    - name: Move httpd file2
+      template:
+        src: "/home/daou_docker/apache-exporter/httpd/conf.d/server-status.conf"
+        dest: "/home/daou_docker/exporters/apache-exporter/httpd/conf.d"
+
+    - name: Run httpd
+      become: true
+      shell:
+        chdir: "/home/daou_docker/exporters/apache-exporter"
+        cmd: docker-compose up -d httpd
+
     - name: Run apache-exporter
       become: true
       shell:

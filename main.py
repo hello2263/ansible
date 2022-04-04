@@ -136,7 +136,28 @@ if __name__ == '__main__':
             select_num = select_exporters()
             install_exporters(select_num)
             add_prometheus_targets(select_num)            
-            subprocess.run(['sudo', 'docker', 'restart', 'my_prometheus'])
+            subprocess.run(['cd', '/home/daou_docker/nginx'])
+            subprocess.run(['sudo', 'docker-compose', 'down'])
+            subprocess.run(['sudo', 'docker-compose', 'up', '-d'])
+    
+    elif state == 2:
+        ip = input('Enter NodePC IP\n')
+        with open('/etc/ansible/hosts', 'r') as f:
+            for line in f:
+                pass
+            last_line = line
+            f.close()
+        if last_line != ip:
+            with open("/etc/ansible/hosts", "a") as f:
+                f.write('\n'+ip)
+                f.close()
+        else:
+            print("Already added IP")
+        
+        select_num = select_exporters()
+        install_exporters(select_num)
+        add_prometheus_targets(select_num)
+
 
     delete_lastline()
     db.close()

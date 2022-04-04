@@ -5,27 +5,48 @@
 
     - name: Create tomcat dir
       file:
-        path: /home/daou_docker/exporters/tomcat
+        path: /home/daou_docker/exporters/jmx-exporter
         state: directory
 
     - name: Install tomcat
       template:
         src: "/home/daou_docker/jmx-exporter/docker-compose.yml"
-        dest: "/home/daou_docker/exporters/tomcat"
+        dest: "/home/daou_docker/exporters/jmx-exporter"
+
+    - name: Create Tomcat etc file dir
+      file:
+        path: /home/daou_docker/exporters/jmx-exporter/tomcat/etc
+        state: directory
+
+    - name: Move Tomcat etc file
+      become: true
+      template:
+        src: "/home/daou_docker/jmx-exporter/tomcat/etc/config.yaml"
+        dest: "/home/daou_docker/exporters/jmx-exporter/tomcat/etc"
+
+    - name: Create Tomcat bin file dir
+      file:
+        path: /home/daou_docker/exporters/jmx-exporter/tomcat/bin
+        state: directory
+
+
+    - name: Move Tomcat bin file
+      become: true
+      template:
+        src: "/home/daou_docker/jmx-exporter/tomcat/bin/setenv.sh"
+        dest: "/home/daou_docker/exporters/jmx-exporter/tomcat/bin"
 
     - name: Run Tomcat
       become: true
       shell:
-        chdir: "/home/daou_docker/exporters/tomcat"
+        chdir: "/home/daou_docker/exporters/jmx-exporter"
         cmd: docker-compose up -d tomcat
 
-    - name: Create jmx-exproter dir
-      file:
-        path: /home/daou_docker/exporters/jmx-exporter
-        state: directory
 
     - name: Install & Run jmx-exporter
-      get_url:
+      become: true 
+      get_url: 
         url: https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.16.1/jmx_prometheus_javaagent-0.16.1.jar
         dest: /home/daou_docker/exporters/jmx-exporter
+
 
